@@ -69,7 +69,7 @@ public class AuthenticationTests {
 
     @Test
     public void testThatUserIsLoggedInSuccessfully() throws Exception {
-        // Setup your request data
+        // Setup request data
         LoginForm loginForm = new LoginForm("john.doe@example.com", "password");
 
         // Perform the login request
