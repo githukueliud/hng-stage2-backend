@@ -21,6 +21,7 @@ import com.example.hng_stage2_backend.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -88,7 +89,9 @@ public class OrganizationController {
             return ResponseEntity.ok(successResponse);
         } catch (Exception e) {
             FailureAuthResponse failureAuthResponse = new FailureAuthResponse("Unauthorized", "Failed to retrieve organizations", 401);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(failureAuthResponse);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(failureAuthResponse);
         }
     }
 
