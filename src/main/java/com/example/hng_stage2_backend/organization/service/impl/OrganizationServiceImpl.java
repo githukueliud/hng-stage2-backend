@@ -1,6 +1,7 @@
 package com.example.hng_stage2_backend.organization.service.impl;
 
 
+import com.example.hng_stage2_backend.organization.controller.request.CreateOrganizationRequest;
 import com.example.hng_stage2_backend.organization.entity.Organization;
 import com.example.hng_stage2_backend.organization.entity.OrganizationDto;
 import com.example.hng_stage2_backend.organization.entity.OrganizationMapperClass;
@@ -18,6 +19,28 @@ import java.util.stream.Collectors;
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
     private final OrganizationRepository organizationRepository;
+
+    @Override
+    public Organization getOrganizationById(UUID orgId, String userEmail) {
+
+        Organization organization = organizationRepository.findById(orgId).orElseThrow(() -> new RuntimeException("Organization not found!"));
+
+        if (organization != null && (organization.getCreatedBy().equals(userEmail) || organization.getMembers().contains(userEmail))) {
+            return organization;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Organization createOrganization(CreateOrganizationRequest request, String userEmail) {
+
+        Organization organization = new Organization();
+        organization.setName(request.getName());
+        organization.setDescription(request.getDescription());
+        organization.setCreatedBy(userEmail);
+        return organizationRepository.save(organization);
+    }
 
 
 //    @Override

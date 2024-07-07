@@ -47,6 +47,7 @@ public class RegistrationController {
             organization.setName(organizationName);
             organization.setUserEmail(registerRequest.getEmail());
             organization.setDescription(organizationName + " welcome");
+            organization.setCreatedBy(registerRequest.getEmail());
             organization = organizationRepository.save(organization);
 
             User user = new User();

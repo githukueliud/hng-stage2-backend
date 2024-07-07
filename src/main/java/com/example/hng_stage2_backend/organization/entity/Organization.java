@@ -37,6 +37,10 @@ public class Organization {
 
     private String userEmail;
 
+    private String createdBy;
+
+    private String members;
+
     @ManyToMany(mappedBy = "organizations")
     private List<User> users = new ArrayList<>();
 }
