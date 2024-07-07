@@ -7,6 +7,8 @@ import com.example.hng_stage2_backend.organization.entity.OrganizationDto;
 import com.example.hng_stage2_backend.organization.entity.OrganizationMapperClass;
 import com.example.hng_stage2_backend.organization.repository.OrganizationRepository;
 import com.example.hng_stage2_backend.organization.service.OrganizationService;
+import com.example.hng_stage2_backend.user.entity.User;
+import com.example.hng_stage2_backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +21,45 @@ import java.util.stream.Collectors;
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
     private final OrganizationRepository organizationRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Organization getOrganizationById(UUID orgId, String userEmail) {
 
         Organization organization = organizationRepository.findById(orgId).orElseThrow(() -> new RuntimeException("Organization not found!"));
 
-        if (organization != null && (organization.getCreatedBy().equals(userEmail) || organization.getMembers().contains(userEmail))) {
-            return organization;
-        } else {
-            return null;
+        User user = userRepository.findUserByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found!"));
+
+        // Check if the user created the organization or is a member
+        boolean isCreator = organization.getCreatedBy().equals(userEmail);
+        boolean isMember = organization.getMembers().contains(user.getId().toString());
+
+        // Check membership via query result
+        if (!isCreator && !isMember) {
+            List<Organization> organizations = organizationRepository.findByMembersEmail(userEmail);
+            if (!organizations.contains(organization)) {
+                return null;
+            }
         }
+
+        return organization;
+    }
+
+    @Override
+    public List<Organization> getOrganizationsForUser(String userId) {
+        return organizationRepository.findOrganizationsByUserId(userId);
+    }
+
+
+
+    @Override
+    public List<Organization> getUserOrganizations(String userEmail, String userId) {
+        List<Organization> createdOrganizations = organizationRepository.findByUserEmail(userEmail);
+        List<Organization> memberOrganizations = organizationRepository.findByMemberId(userId);
+
+        // Combine both lists
+        createdOrganizations.addAll(memberOrganizations);
+        return createdOrganizations;
     }
 
     @Override
@@ -40,6 +70,35 @@ public class OrganizationServiceImpl implements OrganizationService {
         organization.setDescription(request.getDescription());
         organization.setCreatedBy(userEmail);
         return organizationRepository.save(organization);
+    }
+
+    @Override
+    public void addUserToOrganization(UUID orgId, UUID userId) {
+        Organization organization = organizationRepository.findById(orgId).orElseThrow(() -> new RuntimeException("Organization not found!"));
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found!"));
+
+
+        organization.getMembers().add(user);
+        organizationRepository.save(organization);
+    }
+
+    @Override
+    public Organization getMemberOrganizationById(UUID orgId, UUID userId) {
+        Organization organization = organizationRepository.findById(orgId)
+                .orElseThrow(() -> new RuntimeException("Organization not found!"));
+
+        // Step 2: Check if the user with userId is a member of the organization
+        boolean isMember = organization.getMembers().stream()
+                .anyMatch(memberId -> memberId.equals(userId.toString()));
+
+        // Step 3: Return the organization if the user is a member, otherwise handle the case
+        if (isMember) {
+            return organization;
+        } else {
+            // Handle the case where the user is not a member (return null or throw an exception)
+            return null; // or throw new RuntimeException("User is not a member of the organization!");
+        }
     }
 
 

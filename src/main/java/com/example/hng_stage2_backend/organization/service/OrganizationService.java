@@ -17,6 +17,15 @@ public interface OrganizationService {
       Organization getOrganizationById(UUID orgId, String userEmail);
 
       Organization createOrganization(CreateOrganizationRequest request, String userEmail);
+
+      void addUserToOrganization(UUID orgId, UUID userId);
+
+      Organization getMemberOrganizationById(UUID orgId, UUID userId);
+
+      List<Organization> getUserOrganizations(String userEmail, String userId);
+
+      List<Organization> getOrganizationsForUser(String userId);
+
 //    OrganizationDto getOrganization(UUID id);
 //
 //    List<OrganizationDto> listOrganization();

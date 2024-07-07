@@ -2,10 +2,12 @@ package com.example.hng_stage2_backend.organization.controller;
 
 
 import com.example.hng_stage2_backend.auth.response.FailureAuthResponse;
+import com.example.hng_stage2_backend.organization.controller.request.AddUserToOrganizationRequest;
 import com.example.hng_stage2_backend.organization.controller.request.CreateOrganizationRequest;
 import com.example.hng_stage2_backend.organization.controller.response.OrganizationData;
 import com.example.hng_stage2_backend.organization.controller.response.OrganizationResponseData;
 import com.example.hng_stage2_backend.organization.controller.response.OrganizationSuccessResponse;
+import com.example.hng_stage2_backend.organization.controller.response.SuccessAddUserToOrganizationResponse;
 import com.example.hng_stage2_backend.organization.controller.response.create.CreateOrgData;
 import com.example.hng_stage2_backend.organization.controller.response.create.CreateOrgSuccessResponse;
 import com.example.hng_stage2_backend.organization.controller.response.id.OrgData;
@@ -21,11 +23,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -54,9 +59,27 @@ public class OrganizationController {
             // get the organizations the user has created or is in
             List<Organization> organizations = organizationRepository.findByUserEmail(authenticatedUser.getEmail());
 
+            List<Organization> orgsList = organizationRepository.findByMembersEmail(authenticatedUser.getEmail());
+
 
             // Map organizations to OrganizationData
-            List<OrganizationData> organizationDataList = organizations.stream()
+//            <OrganizationData> organizationDataList = organizations.stream()
+//                    .map(org -> new OrganizationData(org.getOrgId().toString(), org.getName(), org.getDescription()))
+//                    .collect(Collectors.toList());
+
+
+
+            //testing
+            List<OrganizationData> newOrgsList = orgsList.stream()
+                    .map(org -> new OrganizationData(org.getOrgId().toString(), org.getName(), org.getDescription()))
+                    .collect(Collectors.toList());
+
+
+            // Combine both lists into one stream of OrganizationData
+            List<OrganizationData> organizationDataList = Stream.concat(
+                            organizations.stream(),
+                            orgsList.stream()
+                    )
                     .map(org -> new OrganizationData(org.getOrgId().toString(), org.getName(), org.getDescription()))
                     .collect(Collectors.toList());
 
@@ -76,9 +99,10 @@ public class OrganizationController {
 
         String email = authentication.getName();
 
+        MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
 
         // get organization and check if user has permission
-        Organization organization = organizationService.getOrganizationById(orgId, email);
+        Organization organization = organizationService.getMemberOrganizationById(orgId, UUID.fromString(userDetails.getUserId()));
 
 
         if (organization != null) {
@@ -94,7 +118,13 @@ public class OrganizationController {
 
 
     @PostMapping("/organisations")
-    public ResponseEntity<?> createOrganization(@Valid @RequestBody CreateOrganizationRequest request, Authentication authentication) {
+    public ResponseEntity<?> createOrganization(@Valid @RequestBody CreateOrganizationRequest request, BindingResult bindingResult, Authentication authentication) {
+
+        if (bindingResult.hasErrors()) {
+            FailureAuthResponse failureAuthResponse = new FailureAuthResponse("Bad Request", "Client error", 400);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failureAuthResponse);
+        }
+
         try {
             String userEmail = authentication.getName();
 
@@ -111,6 +141,26 @@ public class OrganizationController {
     }
 
 
+
+    @PostMapping("/organisations/{orgId}/users")
+    public ResponseEntity<?> addUserToOrganization(@PathVariable UUID orgId, @Valid @RequestBody AddUserToOrganizationRequest request, BindingResult bindingResult, Authentication authentication) {
+        if (bindingResult.hasErrors()) {
+            FailureAuthResponse failureAuthResponse = new FailureAuthResponse("Bad Request", "Client error", 400);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failureAuthResponse);
+        }
+
+        try {
+            organizationService.addUserToOrganization(orgId, UUID.fromString(request.getUserId()));
+            return ResponseEntity.ok(new SuccessAddUserToOrganizationResponse("success", "User added to organisation successfully"));
+        } catch (RuntimeException e) {
+            FailureAuthResponse failureAuthResponse = new FailureAuthResponse("Not Found", "Client error", 404);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failureAuthResponse);
+        } catch (Exception e) {
+            FailureAuthResponse failureAuthResponse = new FailureAuthResponse("Internal Server Error", "Client error", 500);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(failureAuthResponse);
+        }
+
+    }
 
 
 

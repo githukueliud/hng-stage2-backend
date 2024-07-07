@@ -39,8 +39,22 @@ public class Organization {
 
     private String createdBy;
 
-    private String members;
+
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+
+    @ManyToMany
+    @JoinTable(
+            name = "organization_members",
+            joinColumns = @JoinColumn(name = "organization_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> members = new ArrayList<>();
 
     @ManyToMany(mappedBy = "organizations")
     private List<User> users = new ArrayList<>();
+
+
+
 }
