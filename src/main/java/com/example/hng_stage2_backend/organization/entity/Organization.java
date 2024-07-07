@@ -1,5 +1,6 @@
 package com.example.hng_stage2_backend.organization.entity;
 
+import com.example.hng_stage2_backend.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -31,4 +34,9 @@ public class Organization {
 
 
     private String description;
+
+    private String userEmail;
+
+    @ManyToMany(mappedBy = "organizations")
+    private List<User> users = new ArrayList<>();
 }

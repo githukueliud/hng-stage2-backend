@@ -46,8 +46,9 @@ public class UserController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             if (!requestedUser.getId().equals(authenticatedUser.getId())) {
-                // Check if the requested user belongs to the organization of the authenticated user
-                if (requestedUser.getOrganization() == null || !requestedUser.getOrganization().getOrgId().equals(authenticatedUser.getOrganization().getOrgId())) {
+                boolean isUserInSameOrganization = authenticatedUser.getOrganizations().stream()
+                        .anyMatch(org -> requestedUser.getOrganizations().contains(org));
+                if (!isUserInSameOrganization) {
                     throw new RuntimeException("Unauthorized access to user details");
                 }
             }

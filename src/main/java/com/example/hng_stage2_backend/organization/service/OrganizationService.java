@@ -9,13 +9,13 @@ import java.util.UUID;
 
 @Service
 public interface OrganizationService {
-    OrganizationDto createOrganization(OrganizationDto organizationDto);
-
-    OrganizationDto updateOrganization(UUID id, OrganizationDto organizationDto);
-
-    OrganizationDto getOrganization(UUID id);
-
-    List<OrganizationDto> listOrganization();
-
-    void deleteOrganization(UUID id);
+//    OrganizationDto createOrganization(OrganizationDto organizationDto);
+//
+//    OrganizationDto updateOrganization(UUID id, OrganizationDto organizationDto);
+//
+//    OrganizationDto getOrganization(UUID id);
+//
+//    List<OrganizationDto> listOrganization();
+//
+//    void deleteOrganization(UUID id);
 }

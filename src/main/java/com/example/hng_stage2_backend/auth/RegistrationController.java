@@ -45,6 +45,8 @@ public class RegistrationController {
             String organizationName = registerRequest.getFirstName() + "'s organization";
             Organization organization = new Organization();
             organization.setName(organizationName);
+            organization.setUserEmail(registerRequest.getEmail());
+            organization.setDescription(organizationName + " welcome");
             organization = organizationRepository.save(organization);
 
             User user = new User();
@@ -53,7 +55,8 @@ public class RegistrationController {
             user.setEmail(registerRequest.getEmail());
             user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
             user.setPhone(registerRequest.getPhone());
-            user.setOrganization(organization);
+            //user.setOrganization(organization);
+            user.setOrganizations(Collections.singletonList(organization));
 
             User savedUser = userRepository.save(user);
 

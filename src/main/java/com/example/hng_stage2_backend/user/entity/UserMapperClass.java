@@ -1,5 +1,6 @@
 package com.example.hng_stage2_backend.user.entity;
 
+import java.util.List;
 import java.util.UUID;
 
 public class UserMapperClass {
@@ -13,7 +14,7 @@ public class UserMapperClass {
                 userDto.getEmail(),
                 userDto.getPassword(),
                 userDto.getPhone(),
-                userDto.getOrganization()
+                userDto.getOrganizations()
         );
     }
 
@@ -24,7 +25,7 @@ public class UserMapperClass {
                 user.getEmail(),
                 user.getPassword(),
                 user.getPhone(),
-                user.getOrganization()
+                user.getOrganizations()
         );
     }
 
