@@ -28,7 +28,7 @@ public class OrganizationTests {
     void testGetUserOrganizationsRequiresAuthentication() throws Exception {
         mockMvc.perform(get("/api/organisations")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status").doesNotExist())
                 .andExpect(jsonPath("$.message").doesNotExist())
                 .andExpect(jsonPath("$.data").doesNotExist());
@@ -42,7 +42,7 @@ public class OrganizationTests {
         mockMvc.perform(post("/api/organisations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status").doesNotExist()) // No status field expected
                 .andExpect(jsonPath("$.message").doesNotExist()) // No message field expected
                 .andExpect(jsonPath("$.data").doesNotExist()); // No data field expected
