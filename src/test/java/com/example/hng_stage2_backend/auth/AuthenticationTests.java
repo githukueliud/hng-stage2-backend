@@ -96,6 +96,7 @@ public class AuthenticationTests {
 
 
 
+
     @Test
     public void testThatUserLoginFails() throws Exception {
         // Create login request
