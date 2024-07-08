@@ -29,16 +29,15 @@ public class SecurityConfiguration {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(registry ->{
-                    registry.requestMatchers("/auth/**").permitAll();
-                    registry.requestMatchers("/register", "/login").permitAll();
+                    registry.requestMatchers("/auth/**", "/register", "/login").permitAll();
                     registry.requestMatchers("/api/**").authenticated();
                     registry.anyRequest().authenticated();
                 })
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(httpBasic -> httpBasic.disable()) // Disable basic auth
-                .formLogin(formLogin -> formLogin.disable()) // Disable form login
+                .httpBasic(AbstractHttpConfigurer::disable) // Disable basic auth
+                .formLogin(AbstractHttpConfigurer::disable) // Disable form login
                 .build();
     }
 
