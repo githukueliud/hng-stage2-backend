@@ -15,7 +15,7 @@ public class MyUserDetails implements UserDetails {
     }
 
     public String getUserId() {
-        return user.getId().toString();
+        return user.getUserId().toString();
     }
 
     public String getFirstName() {

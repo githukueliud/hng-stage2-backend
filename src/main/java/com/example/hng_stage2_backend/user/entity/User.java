@@ -3,6 +3,8 @@ package com.example.hng_stage2_backend.user.entity;
 
 import com.example.hng_stage2_backend.organization.entity.Organization;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +29,7 @@ public class User {
     @jakarta.validation.constraints.NotNull
     @GeneratedValue
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    private UUID userId;
 
     @jakarta.validation.constraints.NotNull
     @Column(nullable = false)
@@ -39,6 +41,7 @@ public class User {
 
     @jakarta.validation.constraints.NotNull
     @Column(nullable = false, unique = true)
+    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$", message = "Email should be valid")
     private String email;
 
     @jakarta.validation.constraints.NotNull

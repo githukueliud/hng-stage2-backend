@@ -2,6 +2,7 @@ package com.example.hng_stage2_backend.config;
 
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -59,12 +60,21 @@ public class JwtService {
     }
 
 
-    private boolean isTokenExpired(String jwtToken) {
-        return extractExpiration(jwtToken).before(new Date());
+//    public boolean isTokenExpired(String jwtToken) {
+//        return extractExpiration(jwtToken).before(new Date());
+//    }
+
+
+    public boolean isTokenExpired(String jwtToken) {
+        try {
+            return extractExpiration(jwtToken).before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true; // Token is expired
+        }
     }
 
 
-    private Date extractExpiration(String jwtToken) {
+    public Date extractExpiration(String jwtToken) {
         return extractClaim(jwtToken, Claims::getExpiration);
     }
 

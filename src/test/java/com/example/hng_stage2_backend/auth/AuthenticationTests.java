@@ -48,11 +48,12 @@ public class AuthenticationTests {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    //live database  doesn't drop users
 //    @BeforeEach
 //    public void setUp() {
 //        // Ensure the user exists in the repository
 //        User user = new User();
-//        user.setId(UUID.randomUUID());
+//        user.setUserId(UUID.randomUUID());
 //        user.setEmail("eliud@example.com");
 //        user.setPassword(passwordEncoder.encode("password"));
 //        user.setFirstName("John");
@@ -62,37 +63,37 @@ public class AuthenticationTests {
 //        userRepository.save(user);
 //    }
 
-//    @Test
-//    public void testThatUserIsLoggedInSuccessfully() throws Exception {
-//        // Setup request data
-//        LoginForm loginForm = new LoginForm("eliud@example.com", "password");
-//
-//        // Perform the login request
-//        mockMvc.perform(post("/auth/login")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(asJsonString(loginForm)))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                // Validate the static parts of the response
-//                .andExpect(jsonPath("$.status").value("success"))
-//                .andExpect(jsonPath("$.message").value("Login successful"))
-//                .andExpect(jsonPath("$.data.user.email").value("eliud@example.com"))
-//                .andExpect(jsonPath("$.data.user.firstName").value("John"))
-//                .andExpect(jsonPath("$.data.user.lastName").value("Doe"))
-//                .andExpect(jsonPath("$.data.user.phone").value("1234567890"))
-//                // Validate the dynamic parts (e.g., check if accessToken and userId are non-null and valid)
-//                .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
-//                .andExpect(jsonPath("$.data.user.userId").isNotEmpty());
-//    }
-//
-//     //Utility method to convert object to JSON string
-//    public static String asJsonString(final Object obj) {
-//        try {
-//            return new ObjectMapper().writeValueAsString(obj);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    @Test
+    public void testThatUserIsLoggedInSuccessfully() throws Exception {
+        // Setup request data
+        LoginForm loginForm = new LoginForm("eliud@example.com", "password");
+
+        // Perform the login request
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(loginForm)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                // Validate the static parts of the response
+                .andExpect(jsonPath("$.status").value("success"))
+                .andExpect(jsonPath("$.message").value("Login successful"))
+                .andExpect(jsonPath("$.data.user.email").value("eliud@example.com"))
+                .andExpect(jsonPath("$.data.user.firstName").value("John"))
+                .andExpect(jsonPath("$.data.user.lastName").value("Doe"))
+                .andExpect(jsonPath("$.data.user.phone").value("1234567890"))
+                // Validate the dynamic parts (e.g., check if accessToken and userId are non-null and valid)
+                .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.data.user.userId").isNotEmpty());
+    }
+
+     //Utility method to convert object to JSON string
+    public static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 
@@ -110,7 +111,7 @@ public class AuthenticationTests {
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnauthorized())
                 .andExpect(content().json(expectedResponse));
     }
 

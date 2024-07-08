@@ -32,7 +32,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         // Check if the user created the organization or is a member
         boolean isCreator = organization.getCreatedBy().equals(userEmail);
-        boolean isMember = organization.getMembers().contains(user.getId().toString());
+        boolean isMember = organization.getMembers().contains(user.getUserId().toString());
 
         // Check membership via query result
         if (!isCreator && !isMember) {

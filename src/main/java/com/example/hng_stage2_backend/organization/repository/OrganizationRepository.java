@@ -14,12 +14,14 @@ import java.util.UUID;
 @Repository
 public interface OrganizationRepository extends JpaRepository<Organization, UUID> {
 
+    List<Organization> findByCreatorOrMembersContaining(User creator, User member);
+
     List<Organization> findByUserEmail(String email);
 
     @Query("SELECT o FROM Organization o JOIN o.members m WHERE m = :userId")
     List<Organization> findByMemberId(String userId);
 
-    @Query("SELECT o FROM Organization o JOIN o.members m WHERE m.id = :userId")
+    @Query("SELECT o FROM Organization o JOIN o.members m WHERE m.userId = :userId")
     List<Organization> findOrganizationsByUserId(@Param("userId") String userId);
 
     @Query("SELECT DISTINCT o FROM Organization o " +

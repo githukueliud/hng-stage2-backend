@@ -85,7 +85,7 @@ public class RegistrationTests {
 
         // Create a mock User entity with an ID
         User user = new User();
-        user.setId(UUID.randomUUID()); // Set a random UUID for the ID
+        user.setUserId(UUID.randomUUID()); // Set a random UUID for the ID
         user.setEmail(email);
         user.setPassword(encodedPassword);
 

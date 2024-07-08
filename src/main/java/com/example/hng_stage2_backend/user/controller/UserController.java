@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
@@ -45,7 +45,7 @@ public class UserController {
             User requestedUser = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            if (!requestedUser.getId().equals(authenticatedUser.getId())) {
+            if (!requestedUser.getUserId().equals(authenticatedUser.getUserId())) {
                 boolean isUserInSameOrganization = authenticatedUser.getOrganizations().stream()
                         .anyMatch(org -> requestedUser.getOrganizations().contains(org));
                 if (!isUserInSameOrganization) {
@@ -55,7 +55,7 @@ public class UserController {
 
 
             SuccessResponseData successResponseData = new SuccessResponseData(
-                    requestedUser.getId().toString(),
+                    requestedUser.getUserId().toString(),
                     requestedUser.getFirstName(),
                     requestedUser.getLastName(),
                     requestedUser.getEmail(),

@@ -61,6 +61,7 @@ public class OrganizationController {
 
             List<Organization> orgsList = organizationRepository.findByMembersEmail(authenticatedUser.getEmail());
 
+            List<Organization> organizationList = organizationRepository.findByCreatorOrMembersContaining(authenticatedUser, authenticatedUser);
 
             // Map organizations to OrganizationData
 //            <OrganizationData> organizationDataList = organizations.stream()
@@ -75,15 +76,17 @@ public class OrganizationController {
                     .collect(Collectors.toList());
 
 
-            // Combine both lists into one stream of OrganizationData
-            List<OrganizationData> organizationDataList = Stream.concat(
-                            organizations.stream(),
-                            orgsList.stream()
-                    )
-                    .map(org -> new OrganizationData(org.getOrgId().toString(), org.getName(), org.getDescription()))
-                    .collect(Collectors.toList());
 
-            OrganizationResponseData responseData = new OrganizationResponseData(organizationDataList);
+            // Combine both lists into one stream of OrganizationData
+//            List<OrganizationData> organizationDataList = Stream.concat(
+//                            //organizations.stream(),
+//                            orgsList.stream(),
+//                    organizationList.stream()
+//                    )
+//                    .map(org -> new OrganizationData(org.getOrgId().toString(), org.getName(), org.getDescription()))
+//                    .collect(Collectors.toList());
+
+            OrganizationResponseData responseData = new OrganizationResponseData(newOrgsList);
             OrganizationSuccessResponse successResponse = new OrganizationSuccessResponse("success", "Organizations retrieved successfully", responseData);
             return ResponseEntity.ok(successResponse);
         } catch (Exception e) {
@@ -104,7 +107,7 @@ public class OrganizationController {
         MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
 
         // get organization and check if user has permission
-        Organization organization = organizationService.getMemberOrganizationById(orgId, UUID.fromString(userDetails.getUserId()));
+        Organization organization = organizationService.getOrganizationById(orgId, email);
 
 
         if (organization != null) {
@@ -127,12 +130,25 @@ public class OrganizationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failureAuthResponse);
         }
 
+
+
         try {
+            if (request.getName().isEmpty()) {
+                FailureAuthResponse failureAuthResponse = new FailureAuthResponse("Bad Request", "Organization name cannot be empty", 400);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failureAuthResponse);
+            }
+
+
             String userEmail = authentication.getName();
 
             Organization organization = organizationService.createOrganization(request, userEmail);
 
             CreateOrgData data = new CreateOrgData(organization.getOrgId().toString(), organization.getName(), organization.getDescription());
+            // Add the creator as a member
+            User creator = userRepository.findUserByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
+            organization.getMembers().add(creator);
+            organizationRepository.save(organization);
+
             CreateOrgSuccessResponse successResponse = new CreateOrgSuccessResponse("success", "Organisation created successfully", data);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(successResponse);

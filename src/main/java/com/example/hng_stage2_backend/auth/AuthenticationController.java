@@ -7,6 +7,7 @@ import com.example.hng_stage2_backend.config.JwtService;
 import com.example.hng_stage2_backend.config.MyUserDetailsService;
 import com.example.hng_stage2_backend.user.entity.MyUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,7 +46,7 @@ public class AuthenticationController {
             return ResponseEntity.ok(successAuthResponse);
         } catch (AuthenticationException e) {
             FailureAuthResponse failureAuthResponse = new FailureAuthResponse("Bad Request", "Authentication failed", 401);
-            return ResponseEntity.badRequest().body(failureAuthResponse);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(failureAuthResponse);
         }
     }
 
